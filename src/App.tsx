@@ -1,4 +1,5 @@
 import { useState, useEffect } from 'react';
+import { Analytics } from '@vercel/analytics/react';
 import { motion, AnimatePresence, useScroll, useTransform } from 'framer-motion';
 import { 
   Menu, X, ChevronRight, ChevronLeft, Play,
@@ -1060,21 +1061,24 @@ function App() {
   const [isContactOpen, setIsContactOpen] = useState(false);
 
   return (
-    <div className="min-h-screen bg-slate-50">
-      <Navigation isContactOpen={isContactOpen} setIsContactOpen={setIsContactOpen} />
-      <main>
-        <HeroSection />
-        <VideoSection />
-        <ModulesSection />
-        <KanbanSection />
-        <FlowSection />
-        <SecuritySection />
-        <ReportsSection />
-        <PricingSection setIsContactOpen={setIsContactOpen} />
-        <CTASection />
-      </main>
-      <Footer />
-    </div>
+    <>
+      <div className="min-h-screen bg-slate-50">
+        <Navigation isContactOpen={isContactOpen} setIsContactOpen={setIsContactOpen} />
+        <main>
+          <HeroSection />
+          <VideoSection />
+          <ModulesSection />
+          <KanbanSection />
+          <FlowSection />
+          <SecuritySection />
+          <ReportsSection />
+          <PricingSection setIsContactOpen={setIsContactOpen} />
+          <CTASection />
+        </main>
+        <Footer />
+      </div>
+      <Analytics />
+    </>
   );
 }
 
