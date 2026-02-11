@@ -1,10 +1,10 @@
 import { useState, useEffect } from 'react';
 import { motion, AnimatePresence, useScroll, useTransform } from 'framer-motion';
 import { 
-  Menu, X, ChevronRight, ChevronLeft, Play, Phone, 
+  Menu, X, ChevronRight, ChevronLeft, Play,
   Shield, BarChart3, Package, Scissors, Ruler, 
   ShoppingCart, Users, Check, XIcon, ArrowRight,
-  TrendingUp, Layers, Lock, Factory, CreditCard, Sparkles, Zap, Crown
+  TrendingUp, Layers, Lock, Factory, CreditCard, Sparkles
 } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from '@/components/ui/dialog';
@@ -64,7 +64,7 @@ const OxenLogo = ({ size = 'md', animated = true }: { size?: 'sm' | 'md' | 'lg',
 };
 
 // Navigation Component
-const Navigation = ({ isContactOpen, setIsContactOpen }) => {
+const Navigation = ({ isContactOpen, setIsContactOpen }: { isContactOpen: boolean; setIsContactOpen: (value: boolean) => void }) => {
   const [isScrolled, setIsScrolled] = useState(false);
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
 
@@ -650,17 +650,16 @@ const KanbanSection = () => {
     ]
   });
 
-  const [draggedTask, setDraggedTask] = useState(null);
-
-  const handleDragStart = (e, task, source) => {
+  const [draggedTask, setDraggedTask] = useState<{ task: { id: number; title: string; priority: string }; source: string } | null>(null);
+  const handleDragStart = (_e: React.DragEvent, task: { id: number; title: string; priority: string }, source: string) => {
     setDraggedTask({ task, source });
   };
 
-  const handleDragOver = (e) => {
+  const handleDragOver = (e: React.DragEvent) => {
     e.preventDefault();
   };
 
-  const handleDrop = (e, target) => {
+  const handleDrop = (e: React.DragEvent, target: string) => {
     e.preventDefault();
     if (!draggedTask) return;
 
@@ -668,8 +667,8 @@ const KanbanSection = () => {
     if (source !== target) {
       setTasks(prev => ({
         ...prev,
-        [source]: prev[source].filter(t => t.id !== task.id),
-        [target]: [...prev[target], task]
+        [source as keyof typeof prev]: prev[source as keyof typeof prev].filter(t => t.id !== task.id),
+        [target as keyof typeof prev]: [...prev[target as keyof typeof prev], task]
       }));
     }
     setDraggedTask(null);
@@ -710,16 +709,16 @@ const KanbanSection = () => {
                   <h3 className="font-bold text-slate-800">{column.title}</h3>
                 </div>
                 <span className="text-xs text-slate-500 bg-slate-100 px-2 py-1 rounded-full inline-block">
-                  {tasks[column.id].length} tareas
+                  {(tasks[column.id as keyof typeof tasks] || []).length} tareas
                 </span>
               </div>
 
               <div className="p-3 space-y-3 min-h-[300px]">
-                {tasks[column.id].map((task) => (
+                {(tasks[column.id as keyof typeof tasks] || []).map((task) => (
                   <motion.div
                     key={task.id}
                     draggable
-                    onDragStart={(e) => handleDragStart(e, task, column.id)}
+                    onDragStart={(e) => handleDragStart(e as any as React.DragEvent, task, column.id)}
                     whileHover={{ scale: 1.02 }}
                     className="bg-gradient-to-br from-white to-slate-50 rounded-lg p-3 shadow-md border border-slate-100 cursor-grab active:cursor-grabbing hover:shadow-lg transition-shadow"
                   >
@@ -735,7 +734,7 @@ const KanbanSection = () => {
                     </div>
                   </motion.div>
                 ))}
-                {tasks[column.id].length === 0 && (
+                {(tasks[column.id as keyof typeof tasks] || []).length === 0 && (
                   <div className="text-center py-12 text-slate-400">
                     <p className="text-sm">Sin tareas</p>
                   </div>
@@ -900,7 +899,7 @@ const ReportsSection = () => {
   );
 };
 
-const PricingSection = ({ setIsContactOpen }) => {
+const PricingSection = ({ setIsContactOpen }: { setIsContactOpen: (value: boolean) => void }) => {
   const [selectedPlan, setSelectedPlan] = useState('pro');
   const plans = [
     { 
