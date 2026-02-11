@@ -1,0 +1,1467 @@
+import { useState, useEffect } from 'react';
+import { motion, AnimatePresence, useScroll, useTransform } from 'framer-motion';
+import { 
+  Menu, X, ChevronRight, ChevronLeft, Play, Phone, 
+  Shield, BarChart3, Package, Scissors, Ruler, 
+  ShoppingCart, Users, Check, XIcon, ArrowRight,
+  TrendingUp, Layers, Lock, Factory, CreditCard, Sparkles,
+  MessageSquare
+} from 'lucide-react';
+import { Button } from '@/components/ui/button';
+import { Dialog, DialogContent, DialogHeader, DialogTitle } from '@/components/ui/dialog';
+import { Input } from '@/components/ui/input';
+import { Label } from '@/components/ui/label';
+import { Textarea } from '@/components/ui/textarea';
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
+import { Badge } from '@/components/ui/badge';
+
+// Animation variants
+const fadeInUp = {
+  hidden: { opacity: 0, y: 40 },
+  visible: { opacity: 1, y: 0, transition: { duration: 0.6, ease: "easeOut" } }
+};
+
+const staggerContainer = {
+  hidden: { opacity: 0 },
+  visible: {
+    opacity: 1,
+    transition: { staggerChildren: 0.1, delayChildren: 0.2 }
+  }
+};
+
+// Logo Component
+const OxenLogo = ({ size = 'md', animated = true }: { size?: 'sm' | 'md' | 'lg', animated?: boolean }) => {
+  const sizes = {
+    sm: { dots: [3, 4, 5, 7, 4, 5], text: 'text-sm', gap: 'gap-1' },
+    md: { dots: [4, 5, 6, 8, 5, 6], text: 'text-xl', gap: 'gap-1.5' },
+    lg: { dots: [5, 6, 8, 10, 6, 8], text: 'text-3xl', gap: 'gap-2' }
+  };
+  const s = sizes[size];
+  const colors = ['#1e6cff', '#39b7ff', '#5ee7ff', '#4fffc1', '#3dff78', '#22e56f'];
+
+  return (
+    <div className="flex flex-col items-center">
+      <div className={`flex ${s.gap}`}>
+        {s.dots.map((d, i) => (
+          <motion.span
+            key={i}
+            className="rounded-full"
+            style={{ 
+              width: d, 
+              height: d, 
+              backgroundColor: colors[i],
+            }}
+            animate={animated ? {
+              scale: [1, 1.4, 1],
+              opacity: [0.7, 1, 0.7],
+            } : {}}
+            transition={animated ? {
+              duration: 1.6,
+              repeat: Infinity,
+              delay: i * 0.15,
+              ease: "easeInOut"
+            } : {}}
+          />
+        ))}
+      </div>
+      <span className={`${s.text} font-bold tracking-[0.2em] gradient-text mt-1 font-['Montserrat']`}>
+        OXEN
+      </span>
+    </div>
+  );
+};
+
+// Navigation Component
+const Navigation = () => {
+  const [isScrolled, setIsScrolled] = useState(false);
+  const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
+  const [isContactOpen, setIsContactOpen] = useState(false);
+
+  useEffect(() => {
+    const handleScroll = () => setIsScrolled(window.scrollY > 50);
+    window.addEventListener('scroll', handleScroll);
+    return () => window.removeEventListener('scroll', handleScroll);
+  }, []);
+
+  const navLinks = [
+    { href: '#modulos', label: 'Módulos' },
+    { href: '#flujo', label: 'Flujo' },
+    { href: '#seguridad', label: 'Permisos' },
+    { href: '#reportes', label: 'Reportes' },
+    { href: '#cotizacion', label: 'Precios' },
+  ];
+
+  return (
+    <>
+      <motion.header
+        className={`fixed top-0 left-0 right-0 z-50 transition-all duration-300 ${
+          isScrolled ? 'glass shadow-lg' : 'bg-transparent'
+        }`}
+        initial={{ y: -100 }}
+        animate={{ y: 0 }}
+        transition={{ duration: 0.5 }}
+      >
+        <div className="w-full max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+          <div className="flex items-center justify-between h-16 lg:h-20">
+            {/* Logo */}
+            <a href="#" className="flex items-center gap-3">
+              <OxenLogo size="sm" animated={false} />
+              <span className={`text-sm font-semibold hidden sm:block text-[#3498db]`}>
+                Operación textil conectada
+              </span>
+            </a>
+
+            {/* Desktop Navigation */}
+            <nav className="hidden lg:flex items-center gap-8">
+              {navLinks.map((link) => (
+                <a
+                  key={link.href}
+                  href={link.href}
+                  className="text-sm font-medium text-slate-600 hover:text-[#3498db] transition-colors relative group"
+                >
+                  {link.label}
+                  <span className="absolute -bottom-1 left-0 w-0 h-0.5 bg-[#3498db] transition-all group-hover:w-full" />
+                </a>
+              ))}
+            </nav>
+
+            {/* CTA Buttons */}
+            <div className="hidden lg:flex items-center gap-3">
+              <a
+                href="https://wa.me/573246802926"
+                target="_blank"
+                rel="noopener noreferrer"
+              >
+                <Button variant="outline" size="sm" className="gap-2 border-green-500 text-green-600 hover:bg-green-50">
+                  <MessageSquare className="w-4 h-4" />
+                  WhatsApp
+                </Button>
+              </a>
+              <Button size="sm" className="gap-2 bg-[#3498db] hover:bg-[#2980b9]" onClick={() => setIsContactOpen(true)}>
+                <Phone className="w-4 h-4" />
+                Contacto
+              </Button>
+            </div>
+
+            {/* Mobile Menu Button */}
+            <button
+              className="lg:hidden p-2"
+              onClick={() => setIsMobileMenuOpen(!isMobileMenuOpen)}
+            >
+              {isMobileMenuOpen ? <X className="w-6 h-6" /> : <Menu className="w-6 h-6" />}
+            </button>
+          </div>
+        </div>
+
+        {/* Mobile Menu */}
+        <AnimatePresence>
+          {isMobileMenuOpen && (
+            <motion.div
+              initial={{ opacity: 0, height: 0 }}
+              animate={{ opacity: 1, height: 'auto' }}
+              exit={{ opacity: 0, height: 0 }}
+              className="lg:hidden glass border-t"
+            >
+              <nav className="flex flex-col p-4 gap-2">
+                {navLinks.map((link) => (
+                  <a
+                    key={link.href}
+                    href={link.href}
+                    className="py-2 px-4 text-slate-700 hover:bg-slate-100 rounded-lg transition-colors"
+                    onClick={() => setIsMobileMenuOpen(false)}
+                  >
+                    {link.label}
+                  </a>
+                ))}
+                <div className="flex flex-col gap-2 mt-4 pt-4 border-t">
+                  <a
+                    href="https://wa.me/573246802926"
+                    target="_blank"
+                    rel="noopener noreferrer"
+                  >
+                    <Button variant="outline" className="w-full gap-2 border-green-500 text-green-600">
+                      <MessageSquare className="w-4 h-4" />
+                      WhatsApp
+                    </Button>
+                  </a>
+                  <Button className="w-full gap-2 bg-[#3498db]" onClick={() => { setIsMobileMenuOpen(false); setIsContactOpen(true); }}>
+                    <Phone className="w-4 h-4" />
+                    Quiero ser contactado
+                  </Button>
+                </div>
+              </nav>
+            </motion.div>
+          )}
+        </AnimatePresence>
+      </motion.header>
+
+      {/* Contact Modal */}
+      <Dialog open={isContactOpen} onOpenChange={setIsContactOpen}>
+        <DialogContent className="sm:max-w-lg max-h-[90vh] overflow-y-auto">
+          <DialogHeader>
+            <DialogTitle className="text-2xl gradient-text">Quiero ser contactado</DialogTitle>
+          </DialogHeader>
+          <ContactForm onClose={() => setIsContactOpen(false)} />
+        </DialogContent>
+      </Dialog>
+    </>
+  );
+};
+
+// Contact Form Component
+const ContactForm = ({ onClose }: { onClose: () => void }) => {
+  const [isSubmitting, setIsSubmitting] = useState(false);
+  const [submitted, setSubmitted] = useState(false);
+
+  const handleSubmit = async (e: React.FormEvent) => {
+    e.preventDefault();
+    setIsSubmitting(true);
+    await new Promise(resolve => setTimeout(resolve, 1500));
+    setIsSubmitting(false);
+    setSubmitted(true);
+    setTimeout(onClose, 2000);
+  };
+
+  if (submitted) {
+    return (
+      <motion.div
+        initial={{ opacity: 0, scale: 0.9 }}
+        animate={{ opacity: 1, scale: 1 }}
+        className="text-center py-8"
+      >
+        <div className="w-16 h-16 bg-green-100 rounded-full flex items-center justify-center mx-auto mb-4">
+          <Check className="w-8 h-8 text-green-600" />
+        </div>
+        <h3 className="text-xl font-semibold text-slate-800 mb-2">¡Mensaje enviado!</h3>
+        <p className="text-slate-600">Un asesor se comunicará contigo pronto.</p>
+      </motion.div>
+    );
+  }
+
+  return (
+    <form onSubmit={handleSubmit} className="space-y-4 mt-4">
+      <div className="grid sm:grid-cols-2 gap-4">
+        <div className="space-y-2">
+          <Label htmlFor="name">Nombre completo</Label>
+          <Input id="name" placeholder="Tu nombre" required />
+        </div>
+        <div className="space-y-2">
+          <Label htmlFor="company">Empresa</Label>
+          <Input id="company" placeholder="Nombre de la empresa" required />
+        </div>
+      </div>
+      <div className="grid sm:grid-cols-2 gap-4">
+        <div className="space-y-2">
+          <Label htmlFor="phone">Teléfono / WhatsApp</Label>
+          <Input id="phone" placeholder="+57 300 123 4567" required />
+        </div>
+        <div className="space-y-2">
+          <Label htmlFor="email">Correo</Label>
+          <Input id="email" type="email" placeholder="tucorreo@empresa.com" required />
+        </div>
+      </div>
+      <div className="space-y-2">
+        <Label htmlFor="users">Número de usuarios estimado</Label>
+        <Select required>
+          <SelectTrigger>
+            <SelectValue placeholder="Selecciona" />
+          </SelectTrigger>
+          <SelectContent>
+            <SelectItem value="1-5">1 a 5</SelectItem>
+            <SelectItem value="6-10">6 a 10</SelectItem>
+            <SelectItem value="11-15">11 a 15</SelectItem>
+            <SelectItem value="16+">16 o más</SelectItem>
+          </SelectContent>
+        </Select>
+      </div>
+      <div className="space-y-2">
+        <Label htmlFor="message">Comentarios</Label>
+        <Textarea id="message" rows={3} placeholder="Cuéntanos qué necesitas implementar" />
+      </div>
+      <div className="flex gap-3 pt-2">
+        <Button type="button" variant="outline" className="flex-1" onClick={onClose}>
+          Cancelar
+        </Button>
+        <Button type="submit" className="flex-1 bg-[#3498db] hover:bg-[#2980b9]" disabled={isSubmitting}>
+          {isSubmitting ? 'Enviando...' : 'Enviar solicitud'}
+        </Button>
+      </div>
+    </form>
+  );
+};
+
+// Hero Section
+const HeroSection = () => {
+  const [isDemoOpen, setIsDemoOpen] = useState(false);
+  const { scrollY } = useScroll();
+  const y1 = useTransform(scrollY, [0, 500], [0, 150]);
+  const y2 = useTransform(scrollY, [0, 500], [0, -100]);
+
+  return (
+    <>
+      <section className="relative min-h-screen flex items-center pt-20 overflow-hidden">
+        {/* Animated Background */}
+        <div className="absolute inset-0 overflow-hidden">
+          <motion.div
+            className="absolute -top-1/2 -left-1/4 w-[800px] h-[800px] rounded-full"
+            style={{
+              background: 'radial-gradient(circle, rgba(52, 152, 219, 0.15) 0%, transparent 70%)',
+              y: y1
+            }}
+          />
+          <motion.div
+            className="absolute -bottom-1/4 -right-1/4 w-[600px] h-[600px] rounded-full"
+            style={{
+              background: 'radial-gradient(circle, rgba(39, 174, 96, 0.12) 0%, transparent 70%)',
+              y: y2
+            }}
+          />
+          <div className="absolute inset-0 dot-pattern opacity-50" />
+        </div>
+
+        <div className="relative w-full max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-12 lg:py-20">
+          <div className="grid lg:grid-cols-2 gap-12 lg:gap-16 items-center">
+            {/* Content */}
+            <motion.div
+              variants={staggerContainer}
+              initial="hidden"
+              animate="visible"
+              className="text-center lg:text-left"
+            >
+              <motion.div variants={fadeInUp}>
+                <Badge variant="secondary" className="mb-4 bg-[#3498db]/10 text-[#3498db] hover:bg-[#3498db]/20">
+                  <Sparkles className="w-3 h-3 mr-1" />
+                  Sistema integral para la industria textil
+                </Badge>
+              </motion.div>
+              
+              <motion.h1
+                variants={fadeInUp}
+                className="text-4xl sm:text-5xl lg:text-6xl font-bold text-slate-800 leading-tight mb-6"
+              >
+                Todo tu negocio en un solo{' '}
+                <span className="gradient-text">panel de control</span>
+              </motion.h1>
+
+              <motion.p
+                variants={fadeInUp}
+                className="text-lg text-slate-600 mb-8 max-w-xl mx-auto lg:mx-0"
+              >
+                OXEN centraliza inventarios, diseño, cortes, producción, trazabilidad y ventas 
+                en una experiencia clara y operativa. Menos fricción, más control.
+              </motion.p>
+
+              <motion.div variants={fadeInUp} className="flex flex-col sm:flex-row gap-4 justify-center lg:justify-start mb-10">
+                <Button
+                  size="lg"
+                  className="gap-2 bg-[#3498db] hover:bg-[#2980b9] btn-shine"
+                  onClick={() => setIsDemoOpen(true)}
+                >
+                  <Play className="w-5 h-5" />
+                  Ver vista previa guiada
+                </Button>
+                <a href="#cotizacion">
+                  <Button size="lg" variant="outline" className="gap-2">
+                    Ver planes y precios
+                    <ArrowRight className="w-5 h-5" />
+                  </Button>
+                </a>
+              </motion.div>
+
+              {/* Trust Cards */}
+              <motion.div
+                variants={staggerContainer}
+                className="grid sm:grid-cols-2 gap-4"
+              >
+                <motion.div
+                  variants={fadeInUp}
+                  className="glass rounded-xl p-4 text-left card-hover"
+                >
+                  <div className="flex items-center gap-3 mb-2">
+                    <div className="w-10 h-10 rounded-lg bg-[#3498db]/10 flex items-center justify-center">
+                      <Lock className="w-5 h-5 text-[#3498db]" />
+                    </div>
+                    <span className="font-semibold text-slate-800">Permisos detallados</span>
+                  </div>
+                  <p className="text-sm text-slate-600">Controla quién ve y edita cada módulo.</p>
+                </motion.div>
+
+                <motion.div
+                  variants={fadeInUp}
+                  className="glass rounded-xl p-4 text-left card-hover"
+                >
+                  <div className="flex items-center gap-3 mb-2">
+                    <div className="w-10 h-10 rounded-lg bg-[#27ae60]/10 flex items-center justify-center">
+                      <TrendingUp className="w-5 h-5 text-[#27ae60]" />
+                    </div>
+                    <span className="font-semibold text-slate-800">Trazabilidad viva</span>
+                  </div>
+                  <p className="text-sm text-slate-600">Órdenes, cortes y avances siempre visibles.</p>
+                </motion.div>
+              </motion.div>
+            </motion.div>
+
+            {/* Dashboard Mockup */}
+            <motion.div
+              initial={{ opacity: 0, x: 100 }}
+              animate={{ opacity: 1, x: 0 }}
+              transition={{ duration: 0.8, delay: 0.3 }}
+              className="relative"
+            >
+              <div className="relative animate-float">
+                {/* Glow Effect */}
+                <div className="absolute -inset-4 bg-gradient-to-r from-[#3498db]/20 to-[#27ae60]/20 rounded-3xl blur-2xl" />
+                
+                {/* Dashboard Card */}
+                <div className="relative bg-white rounded-2xl shadow-2xl overflow-hidden border border-slate-100">
+                  {/* Header */}
+                  <div className="bg-slate-50 px-4 py-3 flex items-center gap-2 border-b">
+                    <div className="flex gap-1.5">
+                      <div className="w-3 h-3 rounded-full bg-red-400" />
+                      <div className="w-3 h-3 rounded-full bg-yellow-400" />
+                      <div className="w-3 h-3 rounded-full bg-green-400" />
+                    </div>
+                  </div>
+
+                  {/* Content */}
+                  <div className="p-5 space-y-4">
+                    {/* KPI */}
+                    <div className="bg-gradient-to-r from-[#27ae60]/10 to-[#27ae60]/5 rounded-xl p-4 flex items-center justify-between">
+                      <span className="font-semibold text-slate-700">Producción activa</span>
+                      <span className="text-2xl font-bold text-[#27ae60]">68%</span>
+                    </div>
+
+                    {/* Grid */}
+                    <div className="grid grid-cols-2 gap-3">
+                      {[
+                        { title: 'Inventario Tela', desc: 'Entradas y salidas', icon: Package, color: '#3498db' },
+                        { title: 'Órdenes de Corte', desc: 'Prioridad y avance', icon: Scissors, color: '#e74c3c' },
+                        { title: 'Producción', desc: 'Control de piso', icon: Factory, color: '#f39c12' },
+                        { title: 'POS', desc: 'Ventas y facturación', icon: ShoppingCart, color: '#9b59b6' },
+                      ].map((item, i) => (
+                        <motion.div
+                          key={i}
+                          initial={{ opacity: 0, y: 20 }}
+                          animate={{ opacity: 1, y: 0 }}
+                          transition={{ delay: 0.5 + i * 0.1 }}
+                          className="bg-slate-50 rounded-lg p-3 hover:shadow-md transition-shadow cursor-pointer group"
+                        >
+                          <item.icon className="w-5 h-5 mb-2" style={{ color: item.color }} />
+                          <div className="font-semibold text-sm text-slate-800">{item.title}</div>
+                          <div className="text-xs text-slate-500">{item.desc}</div>
+                        </motion.div>
+                      ))}
+                    </div>
+
+                    {/* Progress */}
+                    <div className="space-y-2">
+                      <div className="flex justify-between text-sm">
+                        <span className="text-slate-600">Ruta operacional</span>
+                        <span className="font-semibold text-slate-800">70%</span>
+                      </div>
+                      <div className="h-2 bg-slate-100 rounded-full overflow-hidden">
+                        <motion.div
+                          className="h-full rounded-full bg-gradient-to-r from-[#3498db] to-[#27ae60]"
+                          initial={{ width: 0 }}
+                          animate={{ width: '70%' }}
+                          transition={{ duration: 1.5, delay: 0.8 }}
+                        />
+                      </div>
+                    </div>
+                  </div>
+                </div>
+
+                {/* Floating Elements */}
+                <motion.div
+                  className="absolute -top-4 -right-4 bg-white rounded-xl shadow-lg p-3 border"
+                  animate={{ y: [0, -10, 0] }}
+                  transition={{ duration: 3, repeat: Infinity }}
+                >
+                  <div className="flex items-center gap-2">
+                    <div className="w-8 h-8 rounded-full bg-green-100 flex items-center justify-center">
+                      <Check className="w-4 h-4 text-green-600" />
+                    </div>
+                    <div>
+                      <div className="text-xs text-slate-500">Órdenes hoy</div>
+                      <div className="font-bold text-slate-800">+24</div>
+                    </div>
+                  </div>
+                </motion.div>
+
+                <motion.div
+                  className="absolute -bottom-4 -left-4 bg-white rounded-xl shadow-lg p-3 border"
+                  animate={{ y: [0, 10, 0] }}
+                  transition={{ duration: 4, repeat: Infinity }}
+                >
+                  <div className="flex items-center gap-2">
+                    <div className="w-8 h-8 rounded-full bg-blue-100 flex items-center justify-center">
+                      <TrendingUp className="w-4 h-4 text-blue-600" />
+                    </div>
+                    <div>
+                      <div className="text-xs text-slate-500">Eficiencia</div>
+                      <div className="font-bold text-slate-800">94.2%</div>
+                    </div>
+                  </div>
+                </motion.div>
+              </div>
+            </motion.div>
+          </div>
+        </div>
+      </section>
+
+      {/* Demo Modal */}
+      <Dialog open={isDemoOpen} onOpenChange={setIsDemoOpen}>
+        <DialogContent className="sm:max-w-4xl max-h-[90vh] overflow-y-auto">
+          <DialogHeader>
+            <DialogTitle className="text-2xl gradient-text">Conoce OXEN en 9 pasos</DialogTitle>
+          </DialogHeader>
+          <DemoCarousel />
+        </DialogContent>
+      </Dialog>
+    </>
+  );
+};
+
+// Demo Carousel Component
+const DemoCarousel = () => {
+  const [currentStep, setCurrentStep] = useState(0);
+  const steps = [
+    { title: 'Dashboard', description: 'Panel de control centralizado' },
+    { title: 'Inventarios', description: 'Gestión de materiales en tiempo real' },
+    { title: 'Diseño', description: 'Fichas técnicas y patrones' },
+    { title: 'Corte', description: 'Órdenes y planificación' },
+    { title: 'Producción', description: 'Control de piso y avances' },
+    { title: 'POS', description: 'Ventas integradas' },
+    { title: 'Reportes', description: 'Análisis y métricas' },
+    { title: 'Permisos', description: 'Control de acceso' },
+    { title: 'Configuración', description: 'Personalización completa' },
+  ];
+
+  return (
+    <div className="mt-4">
+      <div className="bg-slate-50 rounded-xl p-6 mb-4">
+        <div className="aspect-video bg-gradient-to-br from-slate-800 to-slate-900 rounded-lg flex items-center justify-center relative overflow-hidden">
+          <div className="absolute inset-0 dot-pattern opacity-20" />
+          <motion.div
+            key={currentStep}
+            initial={{ opacity: 0, scale: 0.9 }}
+            animate={{ opacity: 1, scale: 1 }}
+            exit={{ opacity: 0, scale: 0.9 }}
+            className="text-center z-10"
+          >
+            <div className="w-20 h-20 bg-white/10 rounded-2xl flex items-center justify-center mx-auto mb-4 backdrop-blur">
+              <span className="text-4xl font-bold text-white">{currentStep + 1}</span>
+            </div>
+            <h3 className="text-2xl font-bold text-white mb-2">{steps[currentStep].title}</h3>
+            <p className="text-slate-300">{steps[currentStep].description}</p>
+          </motion.div>
+        </div>
+      </div>
+
+      {/* Progress */}
+      <div className="flex items-center gap-2 mb-4">
+        {steps.map((_, i) => (
+          <button
+            key={i}
+            onClick={() => setCurrentStep(i)}
+            className={`flex-1 h-2 rounded-full transition-all ${
+              i <= currentStep ? 'bg-[#3498db]' : 'bg-slate-200'
+            }`}
+          />
+        ))}
+      </div>
+
+      {/* Navigation */}
+      <div className="flex items-center justify-between">
+        <Button
+          variant="outline"
+          onClick={() => setCurrentStep(Math.max(0, currentStep - 1))}
+          disabled={currentStep === 0}
+        >
+          <ChevronLeft className="w-4 h-4 mr-2" />
+          Anterior
+        </Button>
+        <span className="text-sm text-slate-500">
+          Paso {currentStep + 1} de {steps.length}
+        </span>
+        <Button
+          onClick={() => setCurrentStep(Math.min(steps.length - 1, currentStep + 1))}
+          disabled={currentStep === steps.length - 1}
+          className="bg-[#3498db] hover:bg-[#2980b9]"
+        >
+          Siguiente
+          <ChevronRight className="w-4 h-4 ml-2" />
+        </Button>
+      </div>
+    </div>
+  );
+};
+
+// Video Section
+const VideoSection = () => {
+  return (
+    <section className="py-20 relative overflow-hidden">
+      <div className="absolute inset-0 bg-gradient-to-b from-transparent via-[#3498db]/5 to-transparent" />
+      
+      <div className="relative w-full max-w-5xl mx-auto px-4 sm:px-6 lg:px-8">
+        <motion.div
+          initial={{ opacity: 0, y: 40 }}
+          whileInView={{ opacity: 1, y: 0 }}
+          viewport={{ once: true }}
+          transition={{ duration: 0.6 }}
+          className="text-center mb-10"
+        >
+          <h2 className="text-3xl sm:text-4xl font-bold text-slate-800 mb-4">
+            Conoce <span className="gradient-text">OXEN</span>
+          </h2>
+          <p className="text-lg text-slate-600">Sistema integral para la industria textil</p>
+        </motion.div>
+
+        <motion.div
+          initial={{ opacity: 0, scale: 0.95 }}
+          whileInView={{ opacity: 1, scale: 1 }}
+          viewport={{ once: true }}
+          transition={{ duration: 0.6, delay: 0.2 }}
+          className="relative"
+        >
+          {/* Glow Effect */}
+          <div className="absolute -inset-4 bg-gradient-to-r from-[#3498db]/20 to-[#27ae60]/20 rounded-3xl blur-2xl opacity-60" />
+          
+          {/* Video Container */}
+          <div className="relative bg-white rounded-2xl shadow-2xl p-4 border border-slate-100">
+            <div className="aspect-video rounded-xl overflow-hidden bg-slate-900">
+              <iframe
+                src="https://www.youtube.com/embed/XjA7tvuqXG4"
+                title="Video del sistema OXEN"
+                allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share"
+                allowFullScreen
+                className="w-full h-full"
+              />
+            </div>
+          </div>
+        </motion.div>
+      </div>
+    </section>
+  );
+};
+
+// Modules Section
+const ModulesSection = () => {
+  const modules = [
+    {
+      icon: Package,
+      title: 'Inventarios conectados',
+      description: 'Tela, insumos y producto terminado en un solo flujo, con alertas claras.',
+      color: '#3498db',
+      features: ['Kardex en tiempo real', 'Alertas de stock', 'Reservas por orden']
+    },
+    {
+      icon: Ruler,
+      title: 'Diseño y ficha técnica',
+      description: 'Patrones, tablas de medidas y ficha técnica listos para producción.',
+      color: '#9b59b6',
+      features: ['Fichas técnicas', 'Tablas de medida', 'Especificaciones']
+    },
+    {
+      icon: Scissors,
+      title: 'Órdenes de corte',
+      description: 'Planifica, ejecuta y controla cada corte con trazabilidad completa.',
+      color: '#e74c3c',
+      features: ['Planificación', 'Hojas de corte', 'Trazabilidad']
+    },
+    {
+      icon: Factory,
+      title: 'Piso de producción',
+      description: 'Seguimiento de órdenes, control de avances y rutas operacionales.',
+      color: '#f39c12',
+      features: ['Kanban visual', 'Control por etapas', 'Tiempos reales']
+    },
+    {
+      icon: BarChart3,
+      title: 'Reportes inteligentes',
+      description: 'Producción, inventarios y ventas con indicadores accionables.',
+      color: '#27ae60',
+      features: ['Dashboards', 'Exportación', 'Automatización']
+    },
+    {
+      icon: ShoppingCart,
+      title: 'Punto de venta',
+      description: 'Ventas y facturación integradas al stock de producto terminado.',
+      color: '#1abc9c',
+      features: ['Facturación', 'Múltiples cajas', 'Reportes diarios']
+    },
+  ];
+
+  return (
+    <section id="modulos" className="py-20 relative">
+      <div className="absolute inset-0 grid-pattern opacity-30" />
+      
+      <div className="relative w-full max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+        <motion.div
+          initial={{ opacity: 0, y: 40 }}
+          whileInView={{ opacity: 1, y: 0 }}
+          viewport={{ once: true }}
+          className="text-center mb-16"
+        >
+          <Badge variant="secondary" className="mb-4 bg-[#3498db]/10 text-[#3498db]">
+            Funcionalidades
+          </Badge>
+          <h2 className="text-3xl sm:text-4xl font-bold text-slate-800 mb-4">
+            Módulos clave para tu <span className="gradient-text">operación</span>
+          </h2>
+          <p className="text-lg text-slate-600 max-w-2xl mx-auto">
+            Todo lo que el área de producción necesita para operar en tiempo real.
+          </p>
+        </motion.div>
+
+        <motion.div
+          variants={staggerContainer}
+          initial="hidden"
+          whileInView="visible"
+          viewport={{ once: true }}
+          className="grid sm:grid-cols-2 lg:grid-cols-3 gap-6"
+        >
+          {modules.map((module, i) => (
+            <motion.div
+              key={i}
+              variants={fadeInUp}
+              whileHover={{ y: -8, transition: { duration: 0.3 } }}
+              className="group relative bg-white rounded-2xl p-6 shadow-lg border border-slate-100 overflow-hidden"
+            >
+              {/* Hover Gradient */}
+              <div 
+                className="absolute inset-0 opacity-0 group-hover:opacity-100 transition-opacity duration-500"
+                style={{
+                  background: `linear-gradient(135deg, ${module.color}08 0%, ${module.color}04 100%)`
+                }}
+              />
+              
+              {/* Top Border */}
+              <div 
+                className="absolute top-0 left-0 right-0 h-1 opacity-60"
+                style={{ background: `linear-gradient(90deg, ${module.color}, transparent)` }}
+              />
+
+              <div className="relative">
+                <div 
+                  className="w-14 h-14 rounded-xl flex items-center justify-center mb-4 transition-transform group-hover:scale-110"
+                  style={{ backgroundColor: `${module.color}15` }}
+                >
+                  <module.icon className="w-7 h-7" style={{ color: module.color }} />
+                </div>
+
+                <h3 className="text-xl font-bold text-slate-800 mb-2">{module.title}</h3>
+                <p className="text-slate-600 mb-4">{module.description}</p>
+
+                <ul className="space-y-2">
+                  {module.features.map((feature, j) => (
+                    <li key={j} className="flex items-center gap-2 text-sm text-slate-500">
+                      <Check className="w-4 h-4" style={{ color: module.color }} />
+                      {feature}
+                    </li>
+                  ))}
+                </ul>
+              </div>
+            </motion.div>
+          ))}
+        </motion.div>
+      </div>
+    </section>
+  );
+};
+
+// Flow Section
+const FlowSection = () => {
+  const steps = [
+    {
+      number: '01',
+      title: 'Diseño y planeación',
+      description: 'Tablas de medida, ficha técnica y estimaciones listas para costeo.',
+      icon: Ruler,
+      color: '#9b59b6'
+    },
+    {
+      number: '02',
+      title: 'Corte y ejecución',
+      description: 'Órdenes, insumos y avances con control de tiempos.',
+      icon: Scissors,
+      color: '#e74c3c'
+    },
+    {
+      number: '03',
+      title: 'Producción y trazabilidad',
+      description: 'Rutas operacionales y seguimiento por lote o referencia.',
+      icon: Factory,
+      color: '#f39c12'
+    },
+    {
+      number: '04',
+      title: 'Inventario y ventas',
+      description: 'Producto terminado conectado a POS y reportes finales.',
+      icon: ShoppingCart,
+      color: '#27ae60'
+    },
+  ];
+
+  return (
+    <section id="flujo" className="py-20 bg-slate-50 relative overflow-hidden">
+      {/* Background Decoration */}
+      <div className="absolute top-0 right-0 w-1/2 h-full bg-gradient-to-l from-[#3498db]/5 to-transparent" />
+      
+      <div className="relative w-full max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+        <div className="grid lg:grid-cols-2 gap-12 items-center">
+          {/* Left Content */}
+          <motion.div
+            initial={{ opacity: 0, x: -40 }}
+            whileInView={{ opacity: 1, x: 0 }}
+            viewport={{ once: true }}
+          >
+            <Badge variant="secondary" className="mb-4 bg-[#27ae60]/10 text-[#27ae60]">
+              Flujo de trabajo
+            </Badge>
+            <h2 className="text-3xl sm:text-4xl font-bold text-slate-800 mb-4">
+              Un flujo de trabajo <span className="gradient-text">sin saltos</span>
+            </h2>
+            <p className="text-lg text-slate-600 mb-8">
+              Conecta los equipos de diseño, corte, producción y comercial en un mismo tablero.
+            </p>
+
+            {/* Steps */}
+            <div className="space-y-4">
+              {steps.map((step, i) => (
+                <motion.div
+                  key={i}
+                  initial={{ opacity: 0, x: -20 }}
+                  whileInView={{ opacity: 1, x: 0 }}
+                  viewport={{ once: true }}
+                  transition={{ delay: i * 0.1 }}
+                  className="flex items-start gap-4 p-4 bg-white rounded-xl shadow-sm border border-slate-100 hover:shadow-md transition-shadow"
+                >
+                  <div 
+                    className="w-12 h-12 rounded-lg flex items-center justify-center flex-shrink-0"
+                    style={{ backgroundColor: `${step.color}15` }}
+                  >
+                    <step.icon className="w-6 h-6" style={{ color: step.color }} />
+                  </div>
+                  <div>
+                    <div className="flex items-center gap-2 mb-1">
+                      <span className="text-sm font-bold" style={{ color: step.color }}>{step.number}</span>
+                      <h4 className="font-semibold text-slate-800">{step.title}</h4>
+                    </div>
+                    <p className="text-sm text-slate-600">{step.description}</p>
+                  </div>
+                </motion.div>
+              ))}
+            </div>
+          </motion.div>
+
+          {/* Right Panel */}
+          <motion.div
+            initial={{ opacity: 0, x: 40 }}
+            whileInView={{ opacity: 1, x: 0 }}
+            viewport={{ once: true }}
+            transition={{ delay: 0.2 }}
+          >
+            <div className="bg-gradient-to-br from-[#2c3e50] to-[#34495e] rounded-2xl p-8 text-white shadow-2xl">
+              <h3 className="text-2xl font-bold mb-6 flex items-center gap-3">
+                <Layers className="w-6 h-6 text-[#3498db]" />
+                Vista operativa
+              </h3>
+              
+              <ul className="space-y-4">
+                {[
+                  'Órdenes en proceso y avance por línea',
+                  'Tablas de medidas centralizadas',
+                  'Alertas de insumos críticos',
+                  'Distribución y entregas trazables',
+                  'Dashboard en tiempo real',
+                  'Reportes automáticos',
+                ].map((item, i) => (
+                  <motion.li
+                    key={i}
+                    initial={{ opacity: 0, x: 20 }}
+                    whileInView={{ opacity: 1, x: 0 }}
+                    viewport={{ once: true }}
+                    transition={{ delay: 0.3 + i * 0.1 }}
+                    className="flex items-center gap-3"
+                  >
+                    <div className="w-2 h-2 rounded-full bg-[#3498db]" />
+                    <span className="text-slate-200">{item}</span>
+                  </motion.li>
+                ))}
+              </ul>
+
+              <div className="mt-8 pt-6 border-t border-white/10">
+                <div className="flex items-center justify-between">
+                  <div>
+                    <div className="text-sm text-slate-400">Eficiencia promedio</div>
+                    <div className="text-3xl font-bold text-[#27ae60]">94.2%</div>
+                  </div>
+                  <div className="w-24 h-24 relative">
+                    <svg className="w-full h-full transform -rotate-90">
+                      <circle
+                        cx="48"
+                        cy="48"
+                        r="40"
+                        fill="none"
+                        stroke="rgba(255,255,255,0.1)"
+                        strokeWidth="8"
+                      />
+                      <motion.circle
+                        cx="48"
+                        cy="48"
+                        r="40"
+                        fill="none"
+                        stroke="#27ae60"
+                        strokeWidth="8"
+                        strokeLinecap="round"
+                        initial={{ strokeDasharray: '0 251' }}
+                        whileInView={{ strokeDasharray: '236 251' }}
+                        viewport={{ once: true }}
+                        transition={{ duration: 1.5, delay: 0.5 }}
+                      />
+                    </svg>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </motion.div>
+        </div>
+      </div>
+    </section>
+  );
+};
+
+// Security Section
+const SecuritySection = () => {
+  const permissions = [
+    { module: 'Inventario Tela', access: 'edit', icon: Package },
+    { module: 'Producción', access: 'view', icon: Factory },
+    { module: 'POS', access: 'edit', icon: ShoppingCart },
+    { module: 'Reportes', access: 'admin', icon: BarChart3 },
+  ];
+
+  return (
+    <section id="seguridad" className="py-20 relative">
+      <div className="absolute inset-0 dot-pattern opacity-20" />
+      
+      <div className="relative w-full max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+        <div className="grid lg:grid-cols-2 gap-12 items-center">
+          {/* Left Content */}
+          <motion.div
+            initial={{ opacity: 0, y: 40 }}
+            whileInView={{ opacity: 1, y: 0 }}
+            viewport={{ once: true }}
+          >
+            <Badge variant="secondary" className="mb-4 bg-[#e74c3c]/10 text-[#e74c3c]">
+              <Shield className="w-3 h-3 mr-1" />
+              Seguridad
+            </Badge>
+            <h2 className="text-3xl sm:text-4xl font-bold text-slate-800 mb-4">
+              Permisos detallados <span className="gradient-text">por módulo</span>
+            </h2>
+            <p className="text-lg text-slate-600 mb-6">
+              Define quién puede ver, editar o administrar cada parte del sistema. 
+              OXEN incluye perfiles con control detallado y modo solo lectura para equipos operativos.
+            </p>
+
+            <div className="flex flex-wrap gap-3">
+              {['Admin total', 'Solo lectura', 'Edición por área', 'Perfiles por rol'].map((tag, i) => (
+                <span
+                  key={i}
+                  className="px-4 py-2 bg-[#3498db]/10 text-[#3498db] rounded-full text-sm font-medium"
+                >
+                  {tag}
+                </span>
+              ))}
+            </div>
+          </motion.div>
+
+          {/* Right Panel */}
+          <motion.div
+            initial={{ opacity: 0, scale: 0.95 }}
+            whileInView={{ opacity: 1, scale: 1 }}
+            viewport={{ once: true }}
+            transition={{ delay: 0.2 }}
+          >
+            <div className="bg-slate-900 rounded-2xl p-6 shadow-2xl">
+              <h3 className="text-xl font-bold text-white mb-6 flex items-center gap-3">
+                <Users className="w-5 h-5 text-[#3498db]" />
+                Usuarios y permisos
+              </h3>
+
+              <div className="space-y-3">
+                {permissions.map((perm, i) => (
+                  <motion.div
+                    key={i}
+                    initial={{ opacity: 0, x: 20 }}
+                    whileInView={{ opacity: 1, x: 0 }}
+                    viewport={{ once: true }}
+                    transition={{ delay: 0.3 + i * 0.1 }}
+                    className="flex items-center justify-between p-4 bg-white/5 rounded-xl hover:bg-white/10 transition-colors"
+                  >
+                    <div className="flex items-center gap-3">
+                      <div className="w-10 h-10 rounded-lg bg-white/10 flex items-center justify-center">
+                        <perm.icon className="w-5 h-5 text-slate-300" />
+                      </div>
+                      <span className="text-white font-medium">{perm.module}</span>
+                    </div>
+                    <span className={`px-3 py-1 rounded-full text-xs font-semibold ${
+                      perm.access === 'admin' ? 'bg-purple-500/20 text-purple-300' :
+                      perm.access === 'edit' ? 'bg-green-500/20 text-green-300' :
+                      'bg-blue-500/20 text-blue-300'
+                    }`}>
+                      {perm.access === 'admin' ? 'Admin' : perm.access === 'edit' ? 'Editar' : 'Ver'}
+                    </span>
+                  </motion.div>
+                ))}
+              </div>
+
+              <div className="mt-6 pt-6 border-t border-white/10">
+                <div className="flex items-center justify-between text-sm">
+                  <span className="text-slate-400">Total de usuarios</span>
+                  <span className="text-white font-semibold">12 activos</span>
+                </div>
+              </div>
+            </div>
+          </motion.div>
+        </div>
+      </div>
+    </section>
+  );
+};
+
+// Reports Section
+const ReportsSection = () => {
+  const reports = [
+    {
+      icon: Factory,
+      title: 'Producción',
+      description: 'Avance por orden, eficiencia por línea y cumplimiento de entregas.',
+      color: '#3498db',
+      metrics: ['Órdenes activas', 'Eficiencia', 'Tiempos']
+    },
+    {
+      icon: Package,
+      title: 'Inventarios',
+      description: 'Rotación de insumos, stock crítico y movimientos en tiempo real.',
+      color: '#27ae60',
+      metrics: ['Stock actual', 'Rotación', 'Alertas']
+    },
+    {
+      icon: ShoppingCart,
+      title: 'Ventas',
+      description: 'Análisis de referencias, puntos de venta y comportamiento de clientes.',
+      color: '#f39c12',
+      metrics: ['Ventas diarias', 'Top productos', 'Tendencias']
+    },
+  ];
+
+  return (
+    <section id="reportes" className="py-20 bg-slate-50 relative">
+      <div className="absolute inset-0 grid-pattern opacity-30" />
+      
+      <div className="relative w-full max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+        <motion.div
+          initial={{ opacity: 0, y: 40 }}
+          whileInView={{ opacity: 1, y: 0 }}
+          viewport={{ once: true }}
+          className="text-center mb-16"
+        >
+          <Badge variant="secondary" className="mb-4 bg-[#f39c12]/10 text-[#f39c12]">
+            <BarChart3 className="w-3 h-3 mr-1" />
+            Reportes
+          </Badge>
+          <h2 className="text-3xl sm:text-4xl font-bold text-slate-800 mb-4">
+            Reportes que hablan tu <span className="gradient-text">lenguaje</span>
+          </h2>
+          <p className="text-lg text-slate-600 max-w-2xl mx-auto">
+            Visualiza producción, ventas e inventarios para decidir más rápido.
+          </p>
+        </motion.div>
+
+        <motion.div
+          variants={staggerContainer}
+          initial="hidden"
+          whileInView="visible"
+          viewport={{ once: true }}
+          className="grid md:grid-cols-3 gap-6"
+        >
+          {reports.map((report, i) => (
+            <motion.div
+              key={i}
+              variants={fadeInUp}
+              whileHover={{ y: -8 }}
+              className="bg-white rounded-2xl p-6 shadow-lg border border-slate-100"
+            >
+              <div 
+                className="w-14 h-14 rounded-xl flex items-center justify-center mb-4"
+                style={{ backgroundColor: `${report.color}15` }}
+              >
+                <report.icon className="w-7 h-7" style={{ color: report.color }} />
+              </div>
+
+              <h3 className="text-xl font-bold text-slate-800 mb-2">{report.title}</h3>
+              <p className="text-slate-600 mb-4">{report.description}</p>
+
+              <div className="flex flex-wrap gap-2">
+                {report.metrics.map((metric, j) => (
+                  <span
+                    key={j}
+                    className="px-3 py-1 rounded-full text-xs font-medium"
+                    style={{ backgroundColor: `${report.color}15`, color: report.color }}
+                  >
+                    {metric}
+                  </span>
+                ))}
+              </div>
+            </motion.div>
+          ))}
+        </motion.div>
+      </div>
+    </section>
+  );
+};
+
+// Pricing Section
+const PricingSection = () => {
+  const [selectedPlan, setSelectedPlan] = useState('pro');
+
+  const plans = [
+    {
+      id: 'basic',
+      name: 'Plan Básico',
+      price: '$350.000',
+      users: 'Hasta 5 usuarios',
+      annualSave: '$420.000',
+      setup: '$999.000',
+      freeMonths: 1,
+      features: [
+        { name: 'Inventarios (insumos, materia prima)', included: true },
+        { name: 'Kardex y reservas por orden', included: true },
+        { name: 'Órdenes de producción', included: true },
+        { name: 'Diseño: ficha técnica y ficha de corte', included: true },
+        { name: 'Diseño: ruta y tabla de medidas', included: false },
+        { name: 'Registros de producción por etapa', included: false },
+        { name: 'Control de talleres y satélites', included: false },
+        { name: 'Producto terminado y ventas', included: false },
+        { name: 'Dashboards y alertas operativas', included: false },
+        { name: 'Módulo de costos', included: false },
+        { name: 'Soporte prioritario 24/7', included: false },
+      ]
+    },
+    {
+      id: 'pro',
+      name: 'Plan Profesional',
+      price: '$650.000',
+      users: 'Hasta 10 usuarios',
+      annualSave: '$780.000',
+      setup: '$1.499.000',
+      freeMonths: 2,
+      popular: true,
+      features: [
+        { name: 'Inventarios (insumos, materia prima)', included: true },
+        { name: 'Kardex y reservas por orden', included: true },
+        { name: 'Órdenes de producción', included: true },
+        { name: 'Diseño: ficha técnica y ficha de corte', included: true },
+        { name: 'Diseño: ruta y tabla de medidas', included: true },
+        { name: 'Registros de producción por etapa', included: true },
+        { name: 'Control de talleres y satélites', included: true },
+        { name: 'Producto terminado y ventas', included: true },
+        { name: 'Dashboards y alertas operativas', included: true },
+        { name: 'Módulo de costos', included: false },
+        { name: 'Soporte prioritario 24/7', included: false },
+      ]
+    },
+    {
+      id: 'elite',
+      name: 'Plan Elite',
+      price: '$720.000',
+      users: 'Hasta 15 usuarios',
+      annualSave: '$864.000',
+      setup: '$1.699.000',
+      freeMonths: 2,
+      features: [
+        { name: 'Inventarios (insumos, materia prima)', included: true },
+        { name: 'Kardex y reservas por orden', included: true },
+        { name: 'Órdenes de producción', included: true },
+        { name: 'Diseño: ficha técnica y ficha de corte', included: true },
+        { name: 'Diseño: ruta y tabla de medidas', included: true },
+        { name: 'Registros de producción por etapa', included: true },
+        { name: 'Control de talleres y satélites', included: true },
+        { name: 'Producto terminado y ventas', included: true },
+        { name: 'Dashboards y alertas operativas', included: true },
+        { name: 'Módulo de costos', included: true },
+        { name: 'Soporte prioritario 24/7', included: true },
+      ]
+    },
+  ];
+
+  return (
+    <section id="cotizacion" className="py-20 relative overflow-hidden">
+      <div className="absolute inset-0 bg-gradient-to-b from-transparent via-[#3498db]/5 to-transparent" />
+      
+      <div className="relative w-full max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+        <motion.div
+          initial={{ opacity: 0, y: 40 }}
+          whileInView={{ opacity: 1, y: 0 }}
+          viewport={{ once: true }}
+          className="text-center mb-16"
+        >
+          <Badge variant="secondary" className="mb-4 bg-[#27ae60]/10 text-[#27ae60]">
+            <CreditCard className="w-3 h-3 mr-1" />
+            Cotización
+          </Badge>
+          <h2 className="text-3xl sm:text-4xl font-bold text-slate-800 mb-4">
+            Planes pensados para <span className="gradient-text">crecer contigo</span>
+          </h2>
+          <p className="text-lg text-slate-600 max-w-3xl mx-auto">
+            OXEN centraliza inventarios, producción y control operativo en tiempo real. 
+            El Plan Básico ya entrega estructura completa para operar, y el Profesional desbloquea el control total.
+          </p>
+        </motion.div>
+
+        {/* Plan Selector */}
+        <div className="flex justify-center mb-12">
+          <div className="inline-flex bg-slate-100 p-1 rounded-xl">
+            {plans.map((plan) => (
+              <button
+                key={plan.id}
+                onClick={() => setSelectedPlan(plan.id)}
+                className={`px-6 py-3 rounded-lg font-medium transition-all ${
+                  selectedPlan === plan.id
+                    ? 'bg-white text-[#3498db] shadow-md'
+                    : 'text-slate-600 hover:text-slate-800'
+                }`}
+              >
+                {plan.name}
+              </button>
+            ))}
+          </div>
+        </div>
+
+        {/* Selected Plan Details */}
+        <AnimatePresence mode="wait">
+          {plans.map((plan) => plan.id === selectedPlan && (
+            <motion.div
+              key={plan.id}
+              initial={{ opacity: 0, y: 20 }}
+              animate={{ opacity: 1, y: 0 }}
+              exit={{ opacity: 0, y: -20 }}
+              transition={{ duration: 0.3 }}
+            >
+              <div className={`bg-white rounded-3xl shadow-xl border-2 overflow-hidden ${
+                plan.popular ? 'border-[#3498db]' : 'border-slate-100'
+              }`}>
+                {plan.popular && (
+                  <div className="bg-[#3498db] text-white text-center py-2 text-sm font-medium">
+                    Más popular
+                  </div>
+                )}
+
+                <div className="p-8 lg:p-12">
+                  <div className="grid lg:grid-cols-3 gap-8 lg:gap-12">
+                    {/* Plan Info */}
+                    <div className="lg:col-span-1">
+                      <h3 className="text-2xl font-bold text-slate-800 mb-2">{plan.name}</h3>
+                      <p className="text-slate-600 mb-6">{plan.users}</p>
+                      
+                      <div className="mb-6">
+                        <span className="text-4xl font-bold gradient-text">{plan.price}</span>
+                        <span className="text-slate-500">/mes</span>
+                      </div>
+
+                      <div className="space-y-3 mb-8">
+                        <div className="flex items-center gap-2 text-sm text-slate-600">
+                          <Check className="w-4 h-4 text-[#27ae60]" />
+                          Pago anual: ahorro {plan.annualSave}
+                        </div>
+                        <div className="flex items-center gap-2 text-sm text-slate-600">
+                          <Check className="w-4 h-4 text-[#27ae60]" />
+                          Implementación: {plan.setup}
+                        </div>
+                        <div className="flex items-center gap-2 text-sm text-slate-600">
+                          <Check className="w-4 h-4 text-[#27ae60]" />
+                          {plan.freeMonths} mes{plan.freeMonths > 1 ? 'es' : ''} gratis
+                        </div>
+                      </div>
+
+                      <Button className="w-full bg-[#3498db] hover:bg-[#2980b9] btn-shine" size="lg">
+                        Elegir {plan.name}
+                      </Button>
+                    </div>
+
+                    {/* Features */}
+                    <div className="lg:col-span-2">
+                      <h4 className="font-semibold text-slate-800 mb-4">Características incluidas</h4>
+                      <div className="grid sm:grid-cols-2 gap-3">
+                        {plan.features.map((feature, i) => (
+                          <div
+                            key={i}
+                            className={`flex items-center gap-3 p-3 rounded-lg ${
+                              feature.included ? 'bg-slate-50' : 'bg-slate-50/50'
+                            }`}
+                          >
+                            {feature.included ? (
+                              <Check className="w-5 h-5 text-[#27ae60] flex-shrink-0" />
+                            ) : (
+                              <XIcon className="w-5 h-5 text-slate-300 flex-shrink-0" />
+                            )}
+                            <span className={feature.included ? 'text-slate-700' : 'text-slate-400'}>
+                              {feature.name}
+                            </span>
+                          </div>
+                        ))}
+                      </div>
+                    </div>
+                  </div>
+                </div>
+              </div>
+            </motion.div>
+          ))}
+        </AnimatePresence>
+
+        {/* Setup Costs */}
+        <motion.div
+          initial={{ opacity: 0, y: 40 }}
+          whileInView={{ opacity: 1, y: 0 }}
+          viewport={{ once: true }}
+          className="mt-12"
+        >
+          <div className="bg-white rounded-2xl shadow-lg border border-slate-100 p-6">
+            <h4 className="font-semibold text-slate-800 mb-4">Implementación, instalación, configuración y capacitación (pago único)</h4>
+            <div className="grid sm:grid-cols-3 gap-4">
+              {plans.map((plan) => (
+                <div key={plan.id} className="p-4 bg-slate-50 rounded-xl">
+                  <div className="font-medium text-slate-800 mb-1">{plan.name}</div>
+                  <div className="text-2xl font-bold text-[#3498db]">{plan.setup}</div>
+                  <div className="text-sm text-slate-500">{plan.freeMonths} mes{plan.freeMonths > 1 ? 'es' : ''} gratis</div>
+                </div>
+              ))}
+            </div>
+            <p className="text-sm text-slate-500 mt-4">
+              * Usuarios adicionales: $20.000 por usuario/mes
+            </p>
+          </div>
+        </motion.div>
+      </div>
+    </section>
+  );
+};
+
+// CTA Section
+const CTASection = () => {
+  return (
+    <section className="py-20 relative overflow-hidden">
+      <div className="absolute inset-0 bg-gradient-to-r from-[#2c3e50] to-[#34495e]" />
+      <div className="absolute inset-0 dot-pattern opacity-10" />
+      
+      {/* Animated Circles */}
+      <motion.div
+        className="absolute top-0 left-0 w-96 h-96 rounded-full bg-[#3498db]/10 blur-3xl"
+        animate={{ x: [0, 50, 0], y: [0, 30, 0] }}
+        transition={{ duration: 8, repeat: Infinity }}
+      />
+      <motion.div
+        className="absolute bottom-0 right-0 w-96 h-96 rounded-full bg-[#27ae60]/10 blur-3xl"
+        animate={{ x: [0, -50, 0], y: [0, -30, 0] }}
+        transition={{ duration: 10, repeat: Infinity }}
+      />
+
+      <div className="relative w-full max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 text-center">
+        <motion.div
+          initial={{ opacity: 0, y: 40 }}
+          whileInView={{ opacity: 1, y: 0 }}
+          viewport={{ once: true }}
+        >
+          <h2 className="text-3xl sm:text-4xl lg:text-5xl font-bold text-white mb-6">
+            ¿Listo para modernizar tu <span className="text-[#3498db]">operación textil</span>?
+          </h2>
+          <p className="text-lg text-slate-300 mb-8 max-w-2xl mx-auto">
+            Da el siguiente paso en tu negocio: te asesoramos y creamos un plan de implementación pensado para ti.
+          </p>
+
+          <div className="flex flex-col sm:flex-row gap-4 justify-center">
+            <a href="https://wa.me/573246802926" target="_blank" rel="noopener noreferrer">
+              <Button size="lg" className="gap-2 bg-green-500 hover:bg-green-600 btn-shine">
+                <MessageSquare className="w-5 h-5" />
+                Hablar por WhatsApp
+              </Button>
+            </a>
+            <a href="#cotizacion">
+              <Button size="lg" variant="outline" className="gap-2 border-white text-white hover:bg-white/10">
+                Ver planes
+                <ArrowRight className="w-5 h-5" />
+              </Button>
+            </a>
+          </div>
+        </motion.div>
+      </div>
+    </section>
+  );
+};
+
+// Footer
+const Footer = () => {
+  const links = [
+    { href: '#modulos', label: 'Módulos' },
+    { href: '#flujo', label: 'Flujo' },
+    { href: '#seguridad', label: 'Permisos' },
+    { href: '#reportes', label: 'Reportes' },
+    { href: '#cotizacion', label: 'Precios' },
+  ];
+
+  return (
+    <footer className="bg-slate-900 text-white py-12">
+      <div className="w-full max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+        <div className="flex flex-col md:flex-row justify-between items-center gap-6">
+          <div className="flex items-center gap-3">
+            <OxenLogo size="sm" animated={false} />
+            <div>
+              <div className="font-bold">OXEN</div>
+              <div className="text-sm text-slate-400">Gestión de producción para la industria textil</div>
+            </div>
+          </div>
+
+          <nav className="flex flex-wrap justify-center gap-6">
+            {links.map((link) => (
+              <a
+                key={link.href}
+                href={link.href}
+                className="text-slate-400 hover:text-white transition-colors"
+              >
+                {link.label}
+              </a>
+            ))}
+          </nav>
+        </div>
+
+        <div className="border-t border-slate-800 mt-8 pt-8 text-center text-sm text-slate-500">
+          © {new Date().getFullYear()} OXEN. Todos los derechos reservados.
+        </div>
+      </div>
+    </footer>
+  );
+};
+
+// Main App Component
+function App() {
+  return (
+    <div className="min-h-screen bg-slate-50">
+      <Navigation />
+      <main>
+        <HeroSection />
+        <VideoSection />
+        <ModulesSection />
+        <FlowSection />
+        <SecuritySection />
+        <ReportsSection />
+        <PricingSection />
+        <CTASection />
+      </main>
+      <Footer />
+    </div>
+  );
+}
+
+export default App;

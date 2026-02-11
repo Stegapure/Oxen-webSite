@@ -1,0 +1,11 @@
+{
+  "buildCommand": "npm run build",
+  "devCommand": "npm run dev",
+  "installCommand": "npm install",
+  "outputDirectory": "dist",
+  "framework": "vite",
+  "env": {
+    "VERCEL_ANALYTICS_ID": "@vercel/analytics",
+    "VERCEL_SPEED_INSIGHTS_ID": "@vercel/speed-insights"
+  }
+}
