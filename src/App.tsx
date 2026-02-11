@@ -1,5 +1,6 @@
 import { useState, useEffect } from 'react';
 import { Analytics } from '@vercel/analytics/react';
+import { SpeedInsights } from '@vercel/speed-insights/react';
 import { motion, AnimatePresence, useScroll, useTransform } from 'framer-motion';
 import { 
   Menu, X, ChevronRight, ChevronLeft, Play,
@@ -1078,6 +1079,7 @@ function App() {
         <Footer />
       </div>
       <Analytics />
+      <SpeedInsights />
     </>
   );
 }
