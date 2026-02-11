@@ -457,16 +457,16 @@ const HeroSection = () => {
 const DemoCarousel = () => {
   const [currentStep, setCurrentStep] = useState(0);
   const steps = [
-    { title: 'Dashboard', description: 'Panel de control centralizado', image: '/src/assets/images/1.png' },
-    { title: 'Tablero Kanban', description: 'Gestión visual de tareas y órdenes', image: '/src/assets/images/2.1.png' },
-    { title: 'Inventarios', description: 'Gestión de materiales en tiempo real', image: '/src/assets/images/2.png' },
-    { title: 'Diseño', description: 'Fichas técnicas y patrones', image: '/src/assets/images/3.png' },
-    { title: 'Corte', description: 'Órdenes y planificación', image: '/src/assets/images/4.png' },
-    { title: 'Producción', description: 'Control de piso y avances', image: '/src/assets/images/5.png' },
-    { title: 'POS', description: 'Ventas integradas', image: '/src/assets/images/6.png' },
-    { title: 'Reportes', description: 'Análisis y métricas', image: '/src/assets/images/7.png' },
-    { title: 'Permisos', description: 'Control de acceso', image: '/src/assets/images/8.png' },
-    { title: 'Configuración', description: 'Personalización completa', image: '/src/assets/images/9.png' },
+    { title: 'Dashboard', description: 'Panel de control centralizado', image: '/assets/images/1.png' },
+    { title: 'Tablero Kanban', description: 'Gestión visual de tareas y órdenes', image: '/assets/images/2.1.png' },
+    { title: 'Inventarios', description: 'Gestión de materiales en tiempo real', image: '/assets/images/2.png' },
+    { title: 'Diseño', description: 'Fichas técnicas y patrones', image: '/assets/images/3.png' },
+    { title: 'Corte', description: 'Órdenes y planificación', image: '/assets/images/4.png' },
+    { title: 'Producción', description: 'Control de piso y avances', image: '/assets/images/5.png' },
+    { title: 'POS', description: 'Ventas integradas', image: '/assets/images/6.png' },
+    { title: 'Reportes', description: 'Análisis y métricas', image: '/assets/images/7.png' },
+    { title: 'Permisos', description: 'Control de acceso', image: '/assets/images/8.png' },
+    { title: 'Configuración', description: 'Personalización completa', image: '/assets/images/9.png' },
   ];
 
   return (
@@ -574,7 +574,7 @@ const VideoSection = () => {
           <div className="relative bg-white rounded-2xl shadow-2xl p-4 border border-slate-100">
             <div className="aspect-video rounded-xl overflow-hidden bg-slate-900">
               <video autoPlay muted controls className="w-full h-full object-cover" poster="">
-                <source src="/src/assets/video/Vídeo sin título.mp4" type="video/mp4" />
+                <source src="/assets/video/Vídeo sin título.mp4" type="video/mp4" />
                 Tu navegador no soporta el elemento de video.
               </video>
             </div>
